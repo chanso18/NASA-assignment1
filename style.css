@@ -8,7 +8,7 @@
 /* Base page styles */
 body {
   font-family: Arial, sans-serif;
-  background-color: #f1f1f1;
+  background-color: #fff;
   padding: 20px;
 }
 
@@ -66,12 +66,12 @@ button {
 
 /* Button specific */
 button {
-  background-color: #d3d3d3;
-  color: black;
+  background-color: #0b3d91;
+  color: white;
   cursor: pointer;
 }
 button:hover {
-  background-color: #bfbfbf;
+  background-color: #061f4a;
 }
 
 /* Stack horizontally on wider screens */
@@ -92,8 +92,7 @@ button:hover {
   display: flex;
   gap: 8px;
   align-items: center;
-  background: #ffffff;
-  border: 1px solid #e0e0e0;
+  background: #0b3d91;
   padding: 6px;
   border-radius: 8px;
 }
@@ -174,6 +173,21 @@ button:hover {
   height: 200px;
   object-fit: cover;
   border-radius: 4px;
+
+  /* Smooth transform for hover scaling */
+  transition: transform 250ms ease, box-shadow 250ms ease;
+  transform-origin: center center;
+}
+
+/* Scale image slightly on hover for a smooth, subtle effect */
+.gallery-item:hover img {
+  transform: scale(1.05);
+}
+
+/* Slight lift/elevation for the whole card on hover to match the scale */
+.gallery-item:hover {
+  box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+  transform: translateY(-4px);
 }
 
 .gallery-item p {
@@ -254,8 +268,8 @@ button:hover {
   position: absolute;
   left: 16px;
   bottom: 16px;
-  background: #d3d3d3;
-  color: #000;
+  background: #105bd8;
+  color: #fff;
   border: none;
   padding: 8px 12px;
   border-radius: 6px;
@@ -263,7 +277,7 @@ button:hover {
   font-size: 14px;
 }
 .modal-close:hover {
-  background: #bfbfbf;
+  background: #061f4a;
 }
 
 /* Make sure long text is readable on small screens */

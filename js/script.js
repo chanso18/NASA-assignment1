@@ -102,6 +102,21 @@ function fetchAndDisplayImages() {
     </div>
   `;
 
+  // Create and show a separate loading text line above the gallery.
+  // This is the requested "Loading images......." line which will be removed after load.
+  let loadingTextEl = document.getElementById('loading-text');
+  if (!loadingTextEl) {
+    loadingTextEl = document.createElement('p');
+    loadingTextEl.id = 'loading-text';
+    loadingTextEl.className = 'loading-text';
+    // The exact text required by the user:
+    loadingTextEl.textContent = 'Loading images.......';
+    // Insert the loading text just before the gallery so it is visible to the user.
+    gallery.parentNode.insertBefore(loadingTextEl, gallery);
+  }
+  // Ensure it's visible (in case it was hidden previously)
+  loadingTextEl.style.display = 'block';
+
   // Fetch the JSON data from the provided URL
   // RETURN the promise so callers (the button handler) can know when it finishes.
   return fetch(apodData)
@@ -207,6 +222,13 @@ function fetchAndDisplayImages() {
           <p>Error loading images. Please try again later.</p>
         </div>
       `;
+    })
+    .finally(() => {
+      // Remove the loading text once fetch + processing completes (success or failure).
+      // Use remove() so it is gone from the DOM entirely.
+      if (loadingTextEl && loadingTextEl.parentNode) {
+        loadingTextEl.parentNode.removeChild(loadingTextEl);
+      }
     });
 }
 
