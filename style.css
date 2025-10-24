@@ -87,6 +87,58 @@ button:hover {
   }
 }
 
+/* Compact date box for start/end groups */
+.date-box {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  padding: 6px;
+  border-radius: 8px;
+}
+
+/* Make selects compact and uniform in the date boxes */
+.date-box select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  min-width: 68px;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Slightly larger year select */
+.date-box select#startYear,
+.date-box select#endYear {
+  min-width: 84px;
+}
+
+/* Group wrapper for a label + compact date box */
+.date-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 220px;
+}
+
+/* Small label above each compact date box */
+.date-label {
+  font-size: 13px;
+  color: #333;
+  font-weight: 600;
+  margin-left: 6px;
+}
+
+/* Slightly reduce top spacing for fetch controls when using CSS (keeps consistency) */
+.fetch-controls {
+  margin-top: 6px;
+}
+
 /* Gallery flex container */
 .gallery {
   display: flex;
@@ -141,4 +193,88 @@ button:hover {
 .placeholder-icon {
   font-size: 48px;
   margin-bottom: 20px;
+}
+
+/* Modal overlay and content */
+.image-modal {
+  position: fixed;
+  inset: 0; /* top:0; right:0; bottom:0; left:0; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 10, 10, 0.6);
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow: auto;
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.3);
+}
+
+/* Modal inner elements */
+.modal-title {
+  margin-bottom: 12px;
+  font-size: 20px;
+  color: #222;
+}
+
+.modal-image {
+  width: 100%;
+  height: auto;
+  max-height: 60vh;
+  object-fit: contain;
+  border-radius: 4px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.modal-date {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.modal-explanation {
+  font-size: 15px;
+  color: #333;
+  line-height: 1.45;
+  margin-bottom: 60px; /* space so the close button doesn't overlap */
+}
+
+/* Close button positioned bottom-left inside the modal content */
+.modal-close {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  background: #d3d3d3;
+  color: #000;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.modal-close:hover {
+  background: #bfbfbf;
+}
+
+/* Make sure long text is readable on small screens */
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 14px;
+  }
+  .modal-title {
+    font-size: 18px;
+  }
+  .modal-explanation {
+    font-size: 14px;
+  }
 }
