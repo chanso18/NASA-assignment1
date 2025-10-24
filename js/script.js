@@ -22,15 +22,64 @@ function openModal(imageObj) {
   overlay.id = 'image-modal';
   overlay.className = 'image-modal';
 
+  // Nested helper to convert common video URLs (YouTube / youtu.be / Vimeo) into embed URLs
+  // This keeps the conversion logic local and simple for beginners to follow.
+  function getEmbedUrl(url) {
+    if (!url) return url;
+    try {
+      const parsed = new URL(url);
+      const host = parsed.hostname.toLowerCase();
+
+      // YouTube full URL -> embed
+      if (host.includes('youtube.com')) {
+        const v = parsed.searchParams.get('v');
+        if (v) return `https://www.youtube.com/embed/${v}`;
+      }
+
+      // youtu.be short link -> embed
+      if (host === 'youtu.be') {
+        const id = parsed.pathname.slice(1);
+        if (id) return `https://www.youtube.com/embed/${id}`;
+      }
+
+      // Vimeo -> player embed
+      if (host.includes('vimeo.com')) {
+        const parts = parsed.pathname.split('/');
+        const id = parts.pop() || parts.pop(); // handle trailing slash
+        if (id) return `https://player.vimeo.com/video/${id}`;
+      }
+    } catch (e) {
+      // If URL parsing fails, fall back to original URL
+    }
+    return url;
+  }
+
+  // Decide what media HTML to render: image or video iframe
+  // Use media_type === 'video' to detect video entries from the feed.
+  const mediaHtml =
+    imageObj.media_type === 'video'
+      ? // Video: embed via iframe (use helper to convert known provider links)
+        `<div class="video-wrap">
+           <iframe
+             class="modal-video"
+             src="${escapeHtml(getEmbedUrl(imageObj.url))}"
+             frameborder="0"
+             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+             allowfullscreen
+             title="${escapeHtml(imageObj.title)}"></iframe>
+         </div>`
+      : // Image: show the image as before
+        `<img class="modal-image" src="${escapeHtml(imageObj.url)}" alt="${escapeHtml(
+          imageObj.title
+        )}" />`;
+
   // Build modal content HTML
   overlay.innerHTML = `
     <div class="modal-content" role="dialog" aria-modal="true" aria-label="${escapeHtml(
       imageObj.title
     )}">
       <h2 class="modal-title">${escapeHtml(imageObj.title)}</h2>
-      <img class="modal-image" src="${escapeHtml(imageObj.url)}" alt="${escapeHtml(
-    imageObj.title
-  )}" />
+      ${mediaHtml}
       <p class="modal-date">${escapeHtml(imageObj.date)}</p>
       <p class="modal-explanation">${escapeHtml(imageObj.explanation)}</p>
 
@@ -131,16 +180,18 @@ function fetchAndDisplayImages() {
     .then((data) => {
       // data is expected to be an array of APOD objects
       // Filter to include only items that are images and map to a simpler object
-      const images = data
-        .filter((item) => item.media_type === 'image')
-        .map((item) => {
-          return {
-            title: item.title,
-            url: item.url,
-            date: item.date,
-            explanation: item.explanation,
-          };
-        });
+      // Include all entries and keep media_type so we can render images and videos differently.
+      const images = data.map((item) => {
+        return {
+          title: item.title,
+          url: item.url,
+          date: item.date,
+          explanation: item.explanation,
+          media_type: item.media_type,
+          // some feeds include thumbnail_url for videos — keep if present
+          thumbnail: item.thumbnail_url || null,
+        };
+      });
 
       // Read the selected start/end components and build Date objects (or null)
       const startDate = buildDateFromParts(
@@ -184,13 +235,20 @@ function fetchAndDisplayImages() {
         return;
       }
 
-      // Build HTML for each image card and insert into the gallery
-      // Note: we intentionally do NOT include the explanation on the card.
-      const cardsHtml = filteredImages
+      // Build HTML for each item (handle images and non-image media)
+      const cardsHtml = images
         .map((img, index) => {
+          // If it's an image, show the image tag; otherwise show a video/link placeholder
+          const mediaHtml =
+            img.media_type === 'image'
+              ? `<img src="${escapeHtml(img.url)}" alt="${escapeHtml(img.title)}" />`
+              : img.thumbnail
+              ? `<img src="${escapeHtml(img.thumbnail)}" alt="${escapeHtml(img.title)} (thumbnail)" />`
+              : `<div class="video-placeholder"><a href="${escapeHtml(img.url)}" target="_blank" rel="noopener">View video</a></div>`;
+
           return `
             <div class="gallery-item" data-index="${index}">
-              <img src="${escapeHtml(img.url)}" alt="${escapeHtml(img.title)}" />
+              ${mediaHtml}
               <p><strong>${escapeHtml(img.title)}</strong></p>
               <p>${escapeHtml(img.date)}</p>
             </div>
